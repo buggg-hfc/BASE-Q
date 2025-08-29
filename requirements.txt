@@ -1,0 +1,5 @@
+transformers==4.45.1
+lm-eval==0.4.4
+datasets==3.5.0
+termcolor==3.1.0
+matplotlib==3.10.3
