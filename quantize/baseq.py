@@ -137,11 +137,16 @@ def baseq(
             def __init__(self, module):
                 super().__init__()
                 self.module = module
+                # Bypass `accelerate` device handling to prevent it from
+                # moving `position_ids` to another device.
+                self._forward = getattr(module, "_old_forward", module.forward)
 
             def forward(self, hidden_states, position_ids):
                 if self.module.inv_freq.device != hidden_states.device:
                     self.module.inv_freq = self.module.inv_freq.to(hidden_states.device)
-                return self.module(hidden_states, position_ids)
+                if position_ids.device != hidden_states.device:
+                    position_ids = position_ids.to(hidden_states.device)
+                return self._forward(hidden_states, position_ids)
 
         model.model.rotary_emb = RotaryWrapper(model.model.rotary_emb)
   
