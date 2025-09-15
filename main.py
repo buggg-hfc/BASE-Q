@@ -317,9 +317,9 @@ def main():
 
 
     # quantization
-    if 'llama-2' in args.net.lower():
+    if 'llama2' in args.net.lower():
         args.cache_name = 'llama-2'
-    elif 'llama-3' in args.net.lower():
+    elif 'llama3' in args.net.lower():
         args.cache_name = 'llama-3'
     elif 'qwen2.5' in args.net.lower():
         args.cache_name = 'qwen2.5'
