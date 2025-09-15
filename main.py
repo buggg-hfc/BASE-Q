@@ -45,7 +45,9 @@ net_choices = [
 def evaluate(lm, args, logger):
     results = {}
     
-    if "llama" in args.net.lower() or "qwen" in args.net.lower():
+    if (
+        "llama" in args.net.lower() or "qwen" in args.net.lower()
+    ) and args.device_map == "cpu":
         lm.model = lm.model.to(lm.device)
    
     if args.eval_ppl:
@@ -133,6 +135,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", type=str, help="model name of model path")
     parser.add_argument("--net", type=str, default=None)
+    parser.add_argument(
+        "--device_map",
+        type=str,
+        default="auto",
+        help="device map for model loading, e.g. 'auto' or 'cpu'",
+    )
     parser.add_argument("--cache_dir", default="./cache", type=str, help="cache dir of dataset, leading to faster debug")
     parser.add_argument("--output_dir", default="../log/", type=str, help="direction of logging file")
     parser.add_argument("--scale_load_dir", default=None, type=str, help="direction for loading clipping paras")
