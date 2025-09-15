@@ -141,6 +141,8 @@ def baseq(
             def forward(self, hidden_states, position_ids):
                 if self.module.inv_freq.device != hidden_states.device:
                     self.module.inv_freq = self.module.inv_freq.to(hidden_states.device)
+                if position_ids.device != hidden_states.device:
+                    position_ids = position_ids.to(hidden_states.device)
                 return self.module(hidden_states, position_ids)
 
         model.model.rotary_emb = RotaryWrapper(model.model.rotary_emb)
