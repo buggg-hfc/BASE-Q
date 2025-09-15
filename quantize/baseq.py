@@ -129,7 +129,21 @@ def baseq(
     
 
     layers[0] = layers[0].to(dev)
-    model.model.rotary_emb = model.model.rotary_emb.to(dev)
+
+    if args.device_map == "cpu":
+        model.model.rotary_emb = model.model.rotary_emb.to(dev)
+    else:
+        class RotaryWrapper(nn.Module):
+            def __init__(self, module):
+                super().__init__()
+                self.module = module
+
+            def forward(self, hidden_states, position_ids):
+                if self.module.inv_freq.device != hidden_states.device:
+                    self.module.inv_freq = self.module.inv_freq.to(hidden_states.device)
+                return self.module(hidden_states, position_ids)
+
+        model.model.rotary_emb = RotaryWrapper(model.model.rotary_emb)
   
     if args.deactive_amp and args.epochs>0:
         dtype = torch.float
